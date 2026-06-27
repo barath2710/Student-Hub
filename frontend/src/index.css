@@ -1,0 +1,329 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+@import "tailwindcss";
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   LIGHT THEME
+═══════════════════════════════════════════════════════════════════════════ */
+[data-theme="light"] {
+  /* Surfaces */
+  --bg-app:          #FFFFFF;
+  --surface-1:       #F8F9FA;
+  --surface-2:       #F3F4F6;
+  --surface-3:       #E5E7EB;
+  --card-bg:         #FFFFFF;
+  /* Borders */
+  --border:          #E5E7EB;
+  --border-strong:   #D1D5DB;
+  /* Text */
+  --text-primary:    #111111;
+  --text-secondary:  #6B7280;
+  --text-tertiary:   #9CA3AF;
+  --text-inverse:    #FFFFFF;
+  /* Brand */
+  --primary:         #000000;
+  --primary-hover:   #1F2937;
+  --primary-subtle:  #F3F4F6;
+  --primary-text:    #111111;
+  --accent:          #000000;
+  /* Semantic */
+  --success:         #16A34A;
+  --success-subtle:  #F0FDF4;
+  --success-text:    #166534;
+  --warning:         #D97706;
+  --warning-subtle:  #FFFBEB;
+  --warning-text:    #92400E;
+  --danger:          #DC2626;
+  --danger-subtle:   #FEF2F2;
+  --danger-text:     #991B1B;
+  /* Shadows */
+  --shadow-sm:   0 1px 2px rgba(0,0,0,0.05);
+  --shadow-md:   0 4px 12px rgba(0,0,0,0.05);
+  --shadow-lg:   0 12px 32px rgba(0,0,0,0.08);
+  --shadow-card: 0 1px 3px rgba(0,0,0,0.05), 0 1px 2px rgba(0,0,0,0.03);
+  --shadow-xl:   0 20px 48px rgba(0,0,0,0.1);
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   DARK THEME
+═══════════════════════════════════════════════════════════════════════════ */
+[data-theme="dark"] {
+  /* Surfaces */
+  --bg-app:          #0A0A0A;
+  --surface-1:       #111111;
+  --surface-2:       #1A1A1A;
+  --surface-3:       #262626;
+  --card-bg:         #161616;
+  /* Borders */
+  --border:          #262626;
+  --border-strong:   #3F3F46;
+  /* Text */
+  --text-primary:    #FFFFFF;
+  --text-secondary:  #A3A3A3;
+  --text-tertiary:   #71717A;
+  --text-inverse:    #111111;
+  /* Brand */
+  --primary:         #FFFFFF;
+  --primary-hover:   #E4E4E7;
+  --primary-subtle:  #18181B;
+  --primary-text:    #FFFFFF;
+  --accent:          #FFFFFF;
+  /* Semantic */
+  --success:         #22C55E;
+  --success-subtle:  #052E16;
+  --success-text:    #4ADE80;
+  --warning:         #FBBF24;
+  --warning-subtle:  #1C1400;
+  --warning-text:    #FCD34D;
+  --danger:          #F87171;
+  --danger-subtle:   #2D0A0A;
+  --danger-text:     #FCA5A5;
+  /* Shadows */
+  --shadow-sm:   0 1px 2px rgba(0,0,0,0.2);
+  --shadow-md:   0 4px 16px rgba(0,0,0,0.3);
+  --shadow-lg:   0 12px 40px rgba(0,0,0,0.4);
+  --shadow-card: 0 1px 3px rgba(0,0,0,0.2);
+  --shadow-xl:   0 20px 56px rgba(0,0,0,0.5);
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   GLOBAL TOKENS (theme-independent)
+═══════════════════════════════════════════════════════════════════════════ */
+:root {
+  /* Radius scale */
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+  --radius-xl: 20px;
+
+  /* Font */
+  --font-sans: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+
+  /* Spacing */
+  --space-xs:  4px;
+  --space-sm:  8px;
+  --space-md:  16px;
+  --space-lg:  24px;
+  --space-xl:  32px;
+  --space-2xl: 48px;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   GLOBAL RESET
+═══════════════════════════════════════════════════════════════════════════ */
+*, *::before, *::after { box-sizing: border-box; }
+
+html {
+  color-scheme: light dark;
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  background-color: var(--bg-app);
+  color: var(--text-primary);
+  margin: 0;
+  padding: 0;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  line-height: 1.6;
+  font-size: 16px;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  color: var(--text-primary);
+  margin: 0;
+  line-height: 1.25;
+}
+p { margin: 0; }
+a { color: var(--primary); text-decoration: none; }
+a:hover { color: var(--primary-hover); }
+
+/* ─── Focus ring ─────────────────────────────────────────────────────────── */
+*:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* ─── Scrollbars ─────────────────────────────────────────────────────────── */
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb {
+  background: var(--border-strong);
+  border-radius: 10px;
+}
+::-webkit-scrollbar-thumb:hover { background: var(--text-tertiary); }
+
+.no-scrollbar::-webkit-scrollbar { display: none; }
+.no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+/* ─── Autofill fix for dark mode ─────────────────────────────────────────── */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus {
+  -webkit-text-fill-color: var(--text-primary);
+  -webkit-box-shadow: 0 0 0 1000px var(--surface-2) inset;
+  transition: background-color 5000s ease-in-out 0s;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   KEYFRAME ANIMATIONS
+═══════════════════════════════════════════════════════════════════════════ */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slideInLeft {
+  from { opacity: 0; transform: translateX(-16px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes scaleIn {
+  from { opacity: 0; transform: scale(0.96); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+@keyframes shimmer {
+  0%   { background-position: -200% 0; }
+  100% { background-position:  200% 0; }
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.5; }
+}
+
+@keyframes timerBlink {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0; }
+}
+
+@keyframes barGrow {
+  from { transform: scaleY(0); transform-origin: bottom; opacity: 0; }
+  to   { transform: scaleY(1); transform-origin: bottom; opacity: 1; }
+}
+
+/* ─── Pomodoro session type colour tokens ────────────────────────────────── */
+:root {
+  --pomodoro-focus:       #7C3AED;
+  --pomodoro-short-break: #0D9488;
+  --pomodoro-long-break:  #D97706;
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   UTILITY CLASSES
+═══════════════════════════════════════════════════════════════════════════ */
+
+/* Page entrance */
+.page-enter {
+  animation: slideUp 0.2s ease-out both;
+}
+
+/* Modal entrance */
+.modal-enter {
+  animation: scaleIn 0.18s ease-out both;
+}
+
+/* Sidebar drawer entrance */
+.drawer-enter {
+  animation: slideInLeft 0.2s ease-out both;
+}
+
+/* Skeleton loader */
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    var(--surface-2) 25%,
+    var(--surface-3) 50%,
+    var(--surface-2) 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: 6px;
+  display: block;
+}
+
+/* Spinner */
+.spinner {
+  width: 18px;
+  height: 18px;
+  border: 2px solid rgba(255,255,255,0.3);
+  border-top-color: currentColor;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+  display: inline-block;
+}
+
+/* Responsive sidebar support */
+.app-shell {
+  display: flex;
+  min-height: 100vh;
+  background-color: var(--bg-app);
+}
+
+.sidebar {
+  position: fixed;
+  left: 0;
+  top: 0;
+  height: 100vh;
+  background-color: var(--surface-1);
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  z-index: 40;
+  overflow: hidden;
+  flex-shrink: 0;
+  transition: width 0.2s ease;
+}
+
+.main-content {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  transition: margin-left 0.2s ease;
+}
+
+/* ─── Jarvis AI & Flashcard Animations ────────────────────────────────────── */
+@keyframes jarvisBounce {
+  0%, 100% { transform: translateY(0); opacity: 0.4; }
+  50% { transform: translateY(-6px); opacity: 1; }
+}
+
+.jarvis-dot {
+  animation: jarvisBounce 1.2s infinite ease-in-out;
+}
+.jarvis-dot:nth-child(2) {
+  animation-delay: 0.2s;
+}
+.jarvis-dot:nth-child(3) {
+  animation-delay: 0.4s;
+}
+
+/* 3D card flip helper classes (since standard Tailwind does not include backface-visibility out of the box) */
+.perspective-1000 {
+  perspective: 1000px;
+}
+.transform-style-3d {
+  transform-style: preserve-3d;
+}
+.backface-hidden {
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+.rotate-y-180 {
+  transform: rotateY(180deg);
+}
+
