@@ -1,4 +1,3 @@
-const { PDFParse } = require('pdf-parse')
 const fs = require('fs')
 const path = require('path')
 
@@ -48,6 +47,24 @@ You can help with:
 - Study planning and advice
 - Answering questions about uploaded study materials`
 
+async function extractPdfText(filePath) {
+  let PDFParse
+
+  try {
+    PDFParse = require('pdf-parse').PDFParse
+    const dataBuffer = fs.readFileSync(filePath)
+    const parser = new PDFParse({ data: dataBuffer })
+    const pdfData = await parser.getText()
+    await parser.destroy()
+    return pdfData.text
+  } catch (err) {
+    if (err && err.message && err.message.includes('DOMMatrix')) {
+      throw new ApiError('PDF text extraction is unavailable in this deployment environment.', 500)
+    }
+    throw new ApiError(`Failed to parse PDF: ${err.message}`, 400)
+  }
+}
+
 // Helper: Extract text from a resource file
 async function extractTextFromResource(resource) {
   const filename = resource.fileUrl.replace('/api/uploads/', '')
@@ -60,11 +77,7 @@ async function extractTextFromResource(resource) {
   const fileType = resource.fileType || path.extname(filename).substring(1).toLowerCase()
 
   if (fileType === 'pdf') {
-    const dataBuffer = fs.readFileSync(filePath)
-    const parser = new PDFParse({ data: dataBuffer })
-    const pdfData = await parser.getText()
-    await parser.destroy()
-    return pdfData.text
+    return extractPdfText(filePath)
   } else if (['txt', 'md', 'json', 'js', 'css', 'html', 'csv'].includes(fileType)) {
     return fs.readFileSync(filePath, 'utf8')
   } else {
@@ -501,11 +514,7 @@ const analyzeResume = asyncHandler(async (req, res) => {
     
     try {
       if (fileType === 'pdf') {
-        const dataBuffer = fs.readFileSync(req.file.path)
-        const parser = new PDFParse({ data: dataBuffer })
-        const pdfData = await parser.getText()
-        await parser.destroy()
-        resumeText = pdfData.text
+        resumeText = await extractPdfText(req.file.path)
       } else if (['txt', 'md'].includes(fileType)) {
         resumeText = fs.readFileSync(req.file.path, 'utf8')
       } else {

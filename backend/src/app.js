@@ -1,13 +1,21 @@
-require('dotenv').config({ path: require('path').resolve(__dirname, '../.env'), override: true })
+const path = require('path')
+try {
+  if (process.env.NODE_ENV !== 'production') {
+    require('dotenv').config({ path: path.resolve(__dirname, '../.env'), override: true })
+  }
+} catch (err) {
+  console.warn('dotenv load skipped:', err.message)
+}
 const express = require('express')
 const cors = require('cors')
 const helmet = require('helmet')
 const morgan = require('morgan')
-const path = require('path')
 const connectDB = require('./config/db')
 
 // ─── Connect to MongoDB ───────────────────────────────────────────────────────
-connectDB()
+connectDB().catch((error) => {
+  console.error('⚠️ Initial database connection attempt failed:', error.message)
+})
 
 const app = express()
 
