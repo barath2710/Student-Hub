@@ -1,5 +1,5 @@
 import { createContext, useContext, useState, useEffect, useCallback } from 'react'
-import { loginUser, registerUser, fetchMe } from '../services/authService'
+import { loginUser, registerUser, fetchMe, socialLogin, mobileVerify } from '../services/authService'
 
 const AuthContext = createContext(null)
 
@@ -48,13 +48,31 @@ export function AuthProvider({ children }) {
     return user
   }, [])
 
+  // ── loginWithSocial ────────────────────────────────────────────────────────
+  const loginWithSocial = useCallback(async (provider, id, email, name) => {
+    const res = await socialLogin(provider, id, email, name)
+    const { token, user } = res.data.data
+    localStorage.setItem('token', token)
+    setUser(user)
+    return user
+  }, [])
+
+  // ── loginWithMobile ────────────────────────────────────────────────────────
+  const loginWithMobile = useCallback(async (phoneNumber, code) => {
+    const res = await mobileVerify(phoneNumber, code)
+    const { token, user } = res.data.data
+    localStorage.setItem('token', token)
+    setUser(user)
+    return user
+  }, [])
+
   // ── logout ─────────────────────────────────────────────────────────────────
   const logout = useCallback(() => {
     localStorage.removeItem('token')
     setUser(null)
   }, [])
 
-  const value = { user, loading, login, register, logout }
+  const value = { user, loading, login, register, loginWithSocial, loginWithMobile, logout }
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
 }

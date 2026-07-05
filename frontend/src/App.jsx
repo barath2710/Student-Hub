@@ -11,6 +11,8 @@ import AppLayout    from './components/layout/AppLayout'
 // ── Auth pages (public)
 import Login    from './pages/auth/Login'
 import Register from './pages/auth/Register'
+import ForgotPassword from './pages/auth/ForgotPassword'
+import ResetPassword from './pages/auth/ResetPassword'
 
 // ── Protected pages
 import Dashboard   from './pages/dashboard/Dashboard'
@@ -37,6 +39,8 @@ export default function App() {
             {/* ── Public ─────────────────────────────────────────────── */}
             <Route path="/login"    element={<Login />} />
             <Route path="/register" element={<Register />} />
+            <Route path="/forgot-password" element={<ForgotPassword />} />
+            <Route path="/reset-password/:token" element={<ResetPassword />} />
 
             {/* ── Protected — AppLayout wraps all child routes ────────── */}
             <Route element={<PrivateRoute><AppLayout /></PrivateRoute>}>

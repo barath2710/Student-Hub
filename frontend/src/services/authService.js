@@ -13,3 +13,9 @@ export const changePassword = (currentPassword, newPassword) =>
   api.put('/auth/me/password', { currentPassword, newPassword })
 export const updateProfile = (name) =>
   api.put('/auth/me', { name })
+
+export const forgotPassword = (email) => api.post('/auth/forgot-password', { email })
+export const resetPassword = (token, password) => api.post(`/auth/reset-password/${token}`, { password })
+export const socialLogin = (provider, id, email, name) => api.post('/auth/social-login', { provider, id, email, name })
+export const mobileLogin = (phoneNumber) => api.post('/auth/mobile-login', { phoneNumber })
+export const mobileVerify = (phoneNumber, code) => api.post('/auth/mobile-verify', { phoneNumber, code })

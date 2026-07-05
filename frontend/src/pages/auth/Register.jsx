@@ -123,7 +123,7 @@ function Checkbox({ id, label, checked, onChange }) {
    Register Page
 ══════════════════════════════════════════════════════════════════════════ */
 export default function Register() {
-  const { register } = useAuth()
+  const { register, loginWithSocial, loginWithMobile } = useAuth()
   const navigate     = useNavigate()
 
   const [form, setForm] = useState({
@@ -138,6 +138,13 @@ export default function Register() {
   
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
+
+  // Mobile OTP signup states
+  const [isMobileLogin, setIsMobileLogin] = useState(false)
+  const [phoneNumber, setPhoneNumber] = useState('')
+  const [otpSent, setOtpSent] = useState(false)
+  const [otpCode, setOtpCode] = useState('')
+  const [otpLoading, setOtpLoading] = useState(false)
 
   const handleChange = (field) => (e) =>
     setForm((prev) => ({ ...prev, [field]: e.target.value }))
@@ -171,6 +178,60 @@ export default function Register() {
     }
   }
 
+  const handleSocialClick = async (provider) => {
+    setError('')
+    setLoading(true)
+    try {
+      const id = `${provider}_id_${Math.floor(100000 + Math.random() * 900000)}`
+      const name = provider === 'google' ? 'Google Student' : 'GitHub Developer'
+      const email = provider === 'google' ? 'google.student@studenthub.com' : 'github.dev@studenthub.com'
+      
+      await loginWithSocial(provider, id, email, name)
+      navigate('/dashboard', { replace: true })
+    } catch (err) {
+      setError(err.response?.data?.message || err.message || 'Social registration failed.')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const handleSendOtp = async (e) => {
+    e.preventDefault()
+    if (!phoneNumber.trim()) {
+      setError('Phone number is required.')
+      return
+    }
+    setError('')
+    setOtpLoading(true)
+    try {
+      const { mobileLogin: reqMobileLogin } = await import('../../services/authService')
+      await reqMobileLogin(phoneNumber)
+      setOtpSent(true)
+    } catch (err) {
+      setError(err.response?.data?.message || err.message || 'Failed to send OTP.')
+    } finally {
+      setOtpLoading(false)
+    }
+  }
+
+  const handleVerifyOtp = async (e) => {
+    e.preventDefault()
+    if (!otpCode.trim()) {
+      setError('OTP Code is required.')
+      return
+    }
+    setError('')
+    setLoading(true)
+    try {
+      await loginWithMobile(phoneNumber, otpCode)
+      navigate('/dashboard', { replace: true })
+    } catch (err) {
+      setError(err.response?.data?.message || err.message || 'OTP verification failed.')
+    } finally {
+      setLoading(false)
+    }
+  }
+
   return (
     <div style={{
       display: 'flex',
@@ -193,6 +254,25 @@ export default function Register() {
         }
         @keyframes spin {
           to { transform: rotate(360deg); }
+        }
+        .social-btn {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 10px;
+          width: 100%;
+          padding: 10px;
+          background: var(--surface-1);
+          border: 1px solid var(--border);
+          border-radius: 8px;
+          color: var(--text-primary);
+          font-weight: 500;
+          font-size: 13px;
+          cursor: pointer;
+          transition: background 0.15s ease;
+        }
+        .social-btn:hover {
+          background: var(--surface-2);
         }
       `}</style>
 
@@ -233,31 +313,31 @@ export default function Register() {
         {/* Feature Highlights */}
         <div style={{ maxWidth: '440px' }}>
           <h2 style={{ fontSize: '32px', fontWeight: 800, lineHeight: 1.25, letterSpacing: '-0.03em', marginBottom: '32px', color: '#FFFFFF' }}>
-            Join thousands of students managing their studies.
+            Elevate your study experience today.
           </h2>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '28px' }}>
             <div>
               <h3 style={{ fontSize: '15px', fontWeight: 600, color: '#FFFFFF', marginBottom: '4px' }}>
-                ✦ Clean Workspace
+                ✦ Integrated Study Tools
               </h3>
               <p style={{ fontSize: '13px', color: '#A3A3A3', lineHeight: 1.5, margin: 0 }}>
-                A highly-focused SaaS environment designed to eliminate distractions and keep your lecture notes organized.
+                Notes, schedules, courses, and grades in a highly optimized student interface.
               </p>
             </div>
             <div>
               <h3 style={{ fontSize: '15px', fontWeight: 600, color: '#FFFFFF', marginBottom: '4px' }}>
-                ✦ Task Tracking
+                ✦ Meet Jarvis AI
               </h3>
               <p style={{ fontSize: '13px', color: '#A3A3A3', lineHeight: 1.5, margin: 0 }}>
-                Track deadlines, homework submissions, and exam tasks with clean priority status cards.
+                Get instant quiz questions, concept explanations, and study guides tailored directly to your resources.
               </p>
             </div>
             <div>
               <h3 style={{ fontSize: '15px', fontWeight: 600, color: '#FFFFFF', marginBottom: '4px' }}>
-                ✦ Productivity Insights
+                ✦ Complete Privacy
               </h3>
               <p style={{ fontSize: '13px', color: '#A3A3A3', lineHeight: 1.5, margin: 0 }}>
-                Stay updated with completion ratios and notes counts directly on your personal dashboard.
+                Your assignments and records are stored securely, accessible only by you.
               </p>
             </div>
           </div>
@@ -275,51 +355,171 @@ export default function Register() {
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        padding: '32px 24px',
+        padding: '32px',
       }}>
         <div style={{ width: '100%', maxWidth: '360px' }}>
-          <div style={{ marginBottom: '28px' }}>
+          <div style={{ marginBottom: '32px' }}>
             <h1 style={{ fontSize: '24px', fontWeight: 700, color: 'var(--text-primary)', letterSpacing: '-0.02em', marginBottom: '8px' }}>
-              Create your account
+              {isMobileLogin ? 'Register with Mobile' : 'Create an account'}
             </h1>
             <p style={{ fontSize: '14px', color: 'var(--text-secondary)', margin: 0 }}>
-              Get started with your clean, modern student companion.
+              {isMobileLogin ? 'Use your phone number to sign up instantly.' : 'Get started by creating your new student profile.'}
             </p>
           </div>
 
-          <form id="register-form" onSubmit={handleSubmit} noValidate style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-            <ErrorAlert message={error} />
+          <ErrorAlert message={error} />
 
-            <FloatingInput
-              id="register-name"
-              label="Full Name"
-              value={form.name}
-              onChange={handleChange('name')}
-              autoComplete="name"
-            />
+          {isMobileLogin ? (
+            /* ─── Mobile signup form ─── */
+            <form onSubmit={otpSent ? handleVerifyOtp : handleSendOtp} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+              {!otpSent ? (
+                <>
+                  <FloatingInput
+                    id="mobile-phone"
+                    label="Phone Number"
+                    type="tel"
+                    value={phoneNumber}
+                    onChange={(e) => setPhoneNumber(e.target.value)}
+                  />
+                  <button
+                    type="submit"
+                    disabled={otpLoading}
+                    style={{
+                      padding: '12px',
+                      backgroundColor: 'var(--primary)',
+                      color: 'var(--text-inverse)',
+                      border: 'none',
+                      borderRadius: '8px',
+                      fontSize: '14px',
+                      fontWeight: 600,
+                      cursor: otpLoading ? 'not-allowed' : 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: '8px',
+                    }}
+                  >
+                    {otpLoading ? <span className="spinner" /> : null}
+                    Send Verification Code
+                  </button>
+                </>
+              ) : (
+                <>
+                  <div style={{ padding: '10px 14px', background: 'var(--success-subtle, #DEF7EC)', border: '1px solid var(--success, #31C48D)', borderRadius: '8px', color: 'var(--success-text, #03543F)', fontSize: '13px' }}>
+                    Code sent! Sandbox OTP is <strong>123456</strong>
+                  </div>
+                  <FloatingInput
+                    id="mobile-otp"
+                    label="OTP Verification Code"
+                    type="text"
+                    value={otpCode}
+                    onChange={(e) => setOtpCode(e.target.value)}
+                  />
+                  <button
+                    type="submit"
+                    disabled={loading}
+                    style={{
+                      padding: '12px',
+                      backgroundColor: 'var(--primary)',
+                      color: 'var(--text-inverse)',
+                      border: 'none',
+                      borderRadius: '8px',
+                      fontSize: '14px',
+                      fontWeight: 600,
+                      cursor: loading ? 'not-allowed' : 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: '8px',
+                    }}
+                  >
+                    {loading ? <span className="spinner" /> : null}
+                    Verify & Register
+                  </button>
+                </>
+              )}
+              <button
+                type="button"
+                onClick={() => { setIsMobileLogin(false); setOtpSent(false); }}
+                style={{
+                  background: 'none',
+                  border: 'none',
+                  color: 'var(--text-secondary)',
+                  cursor: 'pointer',
+                  fontSize: '13px',
+                  fontWeight: 500,
+                  textDecoration: 'underline',
+                  textAlign: 'center',
+                }}
+              >
+                Back to Email Signup
+              </button>
+            </form>
+          ) : (
+            /* ─── Regular email registration form ─── */
+            <form id="register-form" onSubmit={handleSubmit} noValidate style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+              <FloatingInput
+                id="register-name"
+                label="Full Name"
+                value={form.name}
+                onChange={handleChange('name')}
+                autoComplete="name"
+              />
 
-            <FloatingInput
-              id="register-email"
-              label="University Email"
-              type="email"
-              value={form.email}
-              onChange={handleChange('email')}
-              autoComplete="email"
-            />
+              <FloatingInput
+                id="register-email"
+                label="Email Address"
+                type="email"
+                value={form.email}
+                onChange={handleChange('email')}
+                autoComplete="email"
+              />
 
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                <div style={{ position: 'relative', display: 'flex', flexDirection: 'column' }}>
+                  <FloatingInput
+                    id="register-password"
+                    label="Password (min. 6 chars)"
+                    type={showPassword ? 'text' : 'password'}
+                    value={form.password}
+                    onChange={handleChange('password')}
+                    autoComplete="new-password"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    style={{
+                      position: 'absolute',
+                      right: '12px',
+                      top: '50%',
+                      transform: 'translateY(-50%)',
+                      background: 'none',
+                      border: 'none',
+                      color: 'var(--text-secondary)',
+                      cursor: 'pointer',
+                      fontSize: '12px',
+                      fontWeight: 600,
+                      padding: '4px',
+                    }}
+                  >
+                    {showPassword ? 'Hide' : 'Show'}
+                  </button>
+                </div>
+                <PasswordStrength password={form.password} />
+              </div>
+
               <div style={{ position: 'relative', display: 'flex', flexDirection: 'column' }}>
                 <FloatingInput
-                  id="register-password"
-                  label="Password"
-                  type={showPassword ? 'text' : 'password'}
-                  value={form.password}
-                  onChange={handleChange('password')}
+                  id="register-confirmPassword"
+                  label="Confirm Password"
+                  type={showConfirmPassword ? 'text' : 'password'}
+                  value={form.confirmPassword}
+                  onChange={handleChange('confirmPassword')}
                   autoComplete="new-password"
                 />
                 <button
                   type="button"
-                  onClick={() => setShowPassword(!showPassword)}
+                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                   style={{
                     position: 'absolute',
                     right: '12px',
@@ -334,82 +534,51 @@ export default function Register() {
                     padding: '4px',
                   }}
                 >
-                  {showPassword ? 'Hide' : 'Show'}
+                  {showConfirmPassword ? 'Hide' : 'Show'}
                 </button>
               </div>
-              <PasswordStrength password={form.password} />
-            </div>
 
-            <div style={{ position: 'relative', display: 'flex', flexDirection: 'column' }}>
-              <FloatingInput
-                id="register-confirm-password"
-                label="Confirm Password"
-                type={showConfirmPassword ? 'text' : 'password'}
-                value={form.confirmPassword}
-                onChange={handleChange('confirmPassword')}
-                autoComplete="new-password"
+              <Checkbox
+                id="register-terms"
+                checked={agreed}
+                onChange={(e) => setAgreed(e.target.checked)}
+                label="I agree to the Terms of Service and Privacy Policy"
               />
+
               <button
-                type="button"
-                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                id="register-submit"
+                type="submit"
+                disabled={loading}
                 style={{
-                  position: 'absolute',
-                  right: '12px',
-                  top: '50%',
-                  transform: 'translateY(-50%)',
-                  background: 'none',
+                  marginTop: '8px',
+                  padding: '12px',
+                  backgroundColor: 'var(--primary)',
+                  color: 'var(--text-inverse)',
                   border: 'none',
-                  color: 'var(--text-secondary)',
-                  cursor: 'pointer',
-                  fontSize: '12px',
+                  borderRadius: '8px',
+                  fontSize: '14px',
                   fontWeight: 600,
-                  padding: '4px',
+                  cursor: loading ? 'not-allowed' : 'pointer',
+                  transition: 'opacity 0.15s ease',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '8px',
                 }}
+                onMouseEnter={e => { if (!loading) e.currentTarget.style.opacity = '0.9' }}
+                onMouseLeave={e => { if (!loading) e.currentTarget.style.opacity = '1' }}
               >
-                {showConfirmPassword ? 'Hide' : 'Show'}
+                {loading ? (
+                  <>
+                    <span className="spinner" />
+                    Creating account...
+                  </>
+                ) : (
+                  'Create Account'
+                )}
               </button>
-            </div>
-
-            <Checkbox
-              id="register-terms"
-              checked={agreed}
-              onChange={(e) => setAgreed(e.target.checked)}
-              label="I agree to the Terms of Service and Privacy Policy"
-            />
-
-            <button
-              id="register-submit"
-              type="submit"
-              disabled={loading}
-              style={{
-                marginTop: '8px',
-                padding: '12px',
-                backgroundColor: 'var(--primary)',
-                color: 'var(--text-inverse)',
-                border: 'none',
-                borderRadius: '8px',
-                fontSize: '14px',
-                fontWeight: 600,
-                cursor: loading ? 'not-allowed' : 'pointer',
-                transition: 'opacity 0.15s ease',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                gap: '8px',
-              }}
-              onMouseEnter={e => { if (!loading) e.currentTarget.style.opacity = '0.9' }}
-              onMouseLeave={e => { if (!loading) e.currentTarget.style.opacity = '1' }}
-            >
-              {loading ? (
-                <>
-                  <span className="spinner" />
-                  Creating account...
-                </>
-              ) : (
-                'Create Account'
-              )}
-            </button>
           </form>
+        )}
 
           <p style={{ fontSize: '14px', color: 'var(--text-secondary)', textAlign: 'center', marginTop: '24px', margin: '24px 0 0' }}>
             Already have an account?{' '}

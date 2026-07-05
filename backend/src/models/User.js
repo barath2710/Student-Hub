@@ -12,18 +12,34 @@ const UserSchema = new mongoose.Schema(
     },
     email: {
       type:     String,
-      required: [true, 'Email is required'],
       unique:   true,
+      sparse:   true,
       lowercase: true,
       trim:     true,
       match:    [/^\S+@\S+\.\S+$/, 'Please provide a valid email address'],
     },
     password: {
       type:      String,
-      required:  [true, 'Password is required'],
       minlength: [6, 'Password must be at least 6 characters'],
       select:    false, // never returned in queries by default
     },
+    googleId: {
+      type:      String,
+      unique:    true,
+      sparse:    true,
+    },
+    githubId: {
+      type:      String,
+      unique:    true,
+      sparse:    true,
+    },
+    phoneNumber: {
+      type:      String,
+      unique:    true,
+      sparse:    true,
+    },
+    resetPasswordToken: String,
+    resetPasswordExpire: Date,
     role: {
       type:    String,
       enum:    ['student', 'teacher', 'admin'],
