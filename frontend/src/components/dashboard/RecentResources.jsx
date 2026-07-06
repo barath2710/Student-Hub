@@ -1,7 +1,8 @@
 import React from 'react'
 import { useNavigate } from 'react-router-dom'
 
-const BASE_URL = import.meta.env.VITE_API_BASE_URL?.replace(/\/api$/, '') || 'http://localhost:5000'
+const apiBase = import.meta.env.VITE_API_BASE_URL || '/api'
+const BASE_URL = apiBase.startsWith('http') ? apiBase.replace(/\/api$/, '') : ''
 
 function timeAgo(dateStr) {
   const diff = (Date.now() - new Date(dateStr)) / 1000

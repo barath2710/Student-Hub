@@ -3,7 +3,8 @@ import useResources from '../../hooks/useResources'
 import UploadModal from '../../components/resources/UploadModal'
 
 // ─── Constants ────────────────────────────────────────────────────────────────
-const BASE_URL = import.meta.env.VITE_API_BASE_URL?.replace(/\/api$/, '') || 'http://localhost:5000'
+const apiBase = import.meta.env.VITE_API_BASE_URL || '/api'
+const BASE_URL = apiBase.startsWith('http') ? apiBase.replace(/\/api$/, '') : ''
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 function formatSize(bytes) {
