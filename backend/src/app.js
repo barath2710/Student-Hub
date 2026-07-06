@@ -76,6 +76,16 @@ if (process.env.NODE_ENV === 'development') {
   app.use(morgan('dev'))
 }
 
+// ─── Ensure Database Connection Middleware ────────────────────────────────────
+app.use(async (req, res, next) => {
+  try {
+    await connectDB()
+    next()
+  } catch (error) {
+    next(error)
+  }
+})
+
 // ─── Routes ──────────────────────────────────────────────────────────────────
 app.use('/api/auth',        require('./routes/authRoutes'))
 app.use('/api/notes',       require('./routes/noteRoutes'))
