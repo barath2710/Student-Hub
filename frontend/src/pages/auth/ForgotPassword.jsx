@@ -92,7 +92,7 @@ export default function ForgotPassword() {
 
     try {
       const res = await forgotPassword(email.trim())
-      setSuccess('Reset link generated! For development, the link is shown below.')
+      setSuccess(`Reset link generated! A simulated reset email was sent to ${email.trim()}. For development, the link is also shown below.`)
       if (res.data?.data?.resetToken) {
         setResetToken(res.data.data.resetToken)
       }
