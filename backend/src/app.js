@@ -49,7 +49,11 @@ app.use(cors({
   origin: (origin, callback) => {
     // Allow server-to-server requests (no Origin header: curl, Postman, SSR)
     if (!origin) return callback(null, true)
-    if (allowedOrigins.includes(origin) || (isDev && origin.startsWith('http://localhost:'))) return callback(null, true)
+    if (
+      allowedOrigins.includes(origin) || 
+      (isDev && origin.startsWith('http://localhost:')) ||
+      origin.endsWith('.vercel.app')
+    ) return callback(null, true)
     callback(new Error(`CORS: origin '${origin}' not allowed`))
   },
   credentials: true,
